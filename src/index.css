@@ -9,46 +9,48 @@ All colors MUST be HSL.
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 215 25% 15%;
+    --foreground: 220 13% 20%;
 
     --card: 0 0% 100%;
-    --card-foreground: 215 25% 15%;
+    --card-foreground: 220 13% 20%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 215 25% 15%;
+    --popover-foreground: 220 13% 20%;
 
-    --primary: 213 94% 18%;
+    --primary: 260 84% 32%;
     --primary-foreground: 0 0% 98%;
-    --primary-hover: 213 94% 22%;
+    --primary-hover: 260 84% 28%;
 
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 213 94% 18%;
+    --secondary: 262 83% 95%;
+    --secondary-foreground: 260 84% 32%;
 
-    --muted: 210 40% 96%;
-    --muted-foreground: 215 16% 47%;
+    --muted: 262 83% 95%;
+    --muted-foreground: 220 13% 50%;
 
-    --accent: 213 94% 18%;
+    --accent: 263 70% 50%;
     --accent-foreground: 0 0% 98%;
 
-    --energy: 45 93% 58%;
-    --energy-foreground: 215 25% 15%;
+    --energy: 176 77% 40%;
+    --energy-foreground: 0 0% 98%;
 
     --success: 142 76% 36%;
     --success-foreground: 0 0% 98%;
 
-    --destructive: 0 84% 60%;
+    --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 213 94% 18%;
+    --border: 262 83% 88%;
+    --input: 262 83% 92%;
+    --ring: 260 84% 32%;
 
-    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-hover)));
-    --gradient-energy: linear-gradient(135deg, hsl(var(--energy)), hsl(45 93% 68%));
-    --gradient-hero: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--energy)) 100%);
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)));
+    --gradient-energy: linear-gradient(135deg, hsl(var(--energy)), hsl(176 77% 50%));
+    --gradient-hero: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent)) 50%, hsl(var(--energy)) 100%);
+    --gradient-card: linear-gradient(145deg, hsl(0 0% 100%), hsl(262 83% 98%));
     
-    --shadow-elegant: 0 10px 30px -10px hsl(var(--primary) / 0.2);
-    --shadow-energy: 0 8px 25px -8px hsl(var(--energy) / 0.3);
+    --shadow-elegant: 0 10px 30px -10px hsl(var(--primary) / 0.15);
+    --shadow-energy: 0 8px 25px -8px hsl(var(--energy) / 0.25);
+    --shadow-card: 0 4px 20px -4px hsl(var(--primary) / 0.08);
 
     --radius: 0.5rem;
 
