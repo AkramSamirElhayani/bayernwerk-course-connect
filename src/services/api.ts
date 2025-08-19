@@ -45,7 +45,7 @@ export const coursesApi = {
       courseId,
     };
 
-    return fetchApi<void>(`/api/courses/${courseId}/requests`, {
+    return fetchApi<void>('/courses/request', {
       method: 'POST',
       body: JSON.stringify(requestData),
     });

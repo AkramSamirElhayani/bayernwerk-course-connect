@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -14,6 +14,11 @@ const Courses = () => {
   const [selectedLevel, setSelectedLevel] = useState<string>("all");
 
   const { data: coursesData, isLoading, error } = useCourses();
+
+  // Scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const categories = ["all", ...(coursesData ? extractCategories(coursesData) : [])];
   const levels = ["all", ...(coursesData ? extractLevels(coursesData) : [])];
