@@ -5,24 +5,54 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search, Filter } from "lucide-react";
 import CourseCard from "@/components/CourseCard";
-import { courses } from "@/data/courses";
+import { useCourses } from "@/hooks/useCourses";
+import { mapCourseForDisplay, extractCategories, extractLevels } from "@/utils/courseMapper";
 
 const Courses = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [selectedLevel, setSelectedLevel] = useState<string>("all");
 
-  const categories = ["all", ...Array.from(new Set(courses.map(course => course.category)))];
-  const levels = ["all", ...Array.from(new Set(courses.map(course => course.level)))];
+  const { data: coursesData, isLoading, error } = useCourses();
 
-  const filteredCourses = courses.filter(course => {
-    const matchesSearch = course.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         course.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === "all" || course.category === selectedCategory;
-    const matchesLevel = selectedLevel === "all" || course.level === selectedLevel;
+  const categories = ["all", ...(coursesData ? extractCategories(coursesData) : [])];
+  const levels = ["all", ...(coursesData ? extractLevels(coursesData) : [])];
+
+  const filteredCourses = coursesData ? coursesData.filter(course => {
+    const mappedCourse = mapCourseForDisplay(course);
+    const matchesSearch = mappedCourse.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         mappedCourse.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = selectedCategory === "all" || mappedCourse.category === selectedCategory;
+    const matchesLevel = selectedLevel === "all" || mappedCourse.level === selectedLevel;
     
     return matchesSearch && matchesCategory && matchesLevel;
-  });
+  }) : [];
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+            <p className="text-muted-foreground">Loading courses...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <p className="text-destructive mb-4">Error loading courses. Please try again later.</p>
+            <Button onClick={() => window.location.reload()}>Retry</Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen py-12">
@@ -104,7 +134,7 @@ const Courses = () => {
         <div className="mb-6">
           <div className="flex items-center justify-between">
             <p className="text-muted-foreground">
-              Showing {filteredCourses.length} of {courses.length} courses
+              Showing {filteredCourses.length} of {coursesData?.length || 0} courses
             </p>
             {filteredCourses.length > 0 && (
               <div className="flex flex-wrap gap-2">
@@ -122,9 +152,10 @@ const Courses = () => {
         {/* Course Grid */}
         {filteredCourses.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredCourses.map((course) => (
-              <CourseCard key={course.id} {...course} />
-            ))}
+            {filteredCourses.map((course) => {
+              const mappedCourse = mapCourseForDisplay(course);
+              return <CourseCard key={course.id} {...mappedCourse} />;
+            })}
           </div>
         ) : (
           <div className="text-center py-16">

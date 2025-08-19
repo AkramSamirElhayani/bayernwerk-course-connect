@@ -11,7 +11,7 @@ interface CourseCardProps {
   duration: string;
   level: string;
   image: string;
-  price?: string;
+  price?: number;
   category: string;
 }
 
@@ -55,7 +55,7 @@ const CourseCard = ({ id, title, description, duration, level, image, price, cat
       
       <CardFooter className="p-6 pt-0 flex justify-between items-center">
         {price && (
-          <span className="text-lg font-semibold text-primary">{price}</span>
+          <span className="text-lg font-semibold text-primary">€{price}</span>
         )}
         <Button variant="outline" asChild className="ml-auto">
           <Link to={`/course/${id}`}>Learn More</Link>

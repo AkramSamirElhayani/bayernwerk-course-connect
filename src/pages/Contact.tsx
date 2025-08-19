@@ -6,9 +6,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { Phone, Mail, MapPin, Send } from "lucide-react";
-import { courses } from "@/data/courses";
+import { useCourses, useCourseRequest } from "@/hooks/useCourses";
+import { mapCourseForDisplay } from "@/utils/courseMapper";
 
 const Contact = () => {
   const [searchParams] = useSearchParams();
@@ -23,8 +24,9 @@ const Contact = () => {
     course: courseId || "",
     message: "",
   });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const { toast } = useToast();
+  
+  const { data: coursesData } = useCourses();
+  const courseRequestMutation = useCourseRequest();
 
   useEffect(() => {
     if (courseId) {
@@ -38,15 +40,34 @@ const Contact = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
-
-    // Simulate form submission
-    setTimeout(() => {
-      toast({
-        title: "Request Submitted Successfully!",
-        description: "We'll contact you within 24 hours with course details.",
+    
+    if (formData.course && formData.course !== "general") {
+      // Submit course request via API
+      courseRequestMutation.mutate({
+        courseId: formData.course,
+        request: {
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          notes: `Phone: ${formData.phone}\nCompany: ${formData.company}\nPosition: ${formData.position}\n\nMessage: ${formData.message}`,
+        }
+      }, {
+        onSuccess: () => {
+          setFormData({
+            firstName: "",
+            lastName: "",
+            email: "",
+            phone: "",
+            company: "",
+            position: "",
+            course: "",
+            message: "",
+          });
+        }
       });
-      setIsSubmitting(false);
+    } else {
+      // General inquiry - just show success message
+      toast.success("Request submitted successfully! We'll contact you within 24 hours.");
       setFormData({
         firstName: "",
         lastName: "",
@@ -57,10 +78,11 @@ const Contact = () => {
         course: "",
         message: "",
       });
-    }, 1000);
+    }
   };
 
-  const selectedCourse = courses.find(c => c.id === formData.course);
+  const selectedCourse = coursesData?.find(c => c.id === formData.course);
+  const mappedSelectedCourse = selectedCourse ? mapCourseForDisplay(selectedCourse) : null;
 
   return (
     <div className="min-h-screen py-12">
@@ -92,11 +114,11 @@ const Contact = () => {
               <CardContent>
                 <form onSubmit={handleSubmit} className="space-y-6">
                   {/* Selected Course Display */}
-                  {selectedCourse && (
+                  {mappedSelectedCourse && (
                     <div className="p-4 bg-primary/5 border border-primary/20 rounded-lg">
                       <p className="text-sm font-medium text-primary mb-1">Selected Course:</p>
-                      <p className="font-semibold">{selectedCourse.title}</p>
-                      <p className="text-sm text-muted-foreground">{selectedCourse.duration} • {selectedCourse.level}</p>
+                      <p className="font-semibold">{mappedSelectedCourse.title}</p>
+                      <p className="text-sm text-muted-foreground">{mappedSelectedCourse.duration} • {mappedSelectedCourse.level}</p>
                     </div>
                   )}
 
@@ -173,11 +195,14 @@ const Contact = () => {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="general">General Inquiry</SelectItem>
-                        {courses.map(course => (
-                          <SelectItem key={course.id} value={course.id}>
-                            {course.title}
-                          </SelectItem>
-                        ))}
+                        {coursesData?.map(course => {
+                          const mapped = mapCourseForDisplay(course);
+                          return (
+                            <SelectItem key={course.id} value={course.id}>
+                              {mapped.title}
+                            </SelectItem>
+                          );
+                        })}
                       </SelectContent>
                     </Select>
                   </div>
@@ -199,9 +224,9 @@ const Contact = () => {
                     variant="hero" 
                     size="lg" 
                     className="w-full"
-                    disabled={isSubmitting}
+                    disabled={courseRequestMutation.isPending}
                   >
-                    {isSubmitting ? "Submitting..." : "Submit Request"}
+                    {courseRequestMutation.isPending ? "Submitting..." : "Submit Request"}
                   </Button>
 
                   <p className="text-xs text-muted-foreground text-center">

@@ -4,11 +4,13 @@ import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
 import { ArrowRight, BookOpen, Users, Award, Zap, Shield, Lightbulb } from "lucide-react";
 import CourseCard from "@/components/CourseCard";
-import { courses } from "@/data/courses";
+import { useCourses } from "@/hooks/useCourses";
+import { mapCourseForDisplay } from "@/utils/courseMapper";
 import heroImage from "@/assets/hero-training.jpg";
 
 const Home = () => {
-  const featuredCourses = courses.slice(0, 3);
+  const { data: coursesData } = useCourses();
+  const featuredCourses = coursesData ? coursesData.slice(0, 3) : [];
 
   return (
     <div className="min-h-screen">
@@ -153,9 +155,10 @@ const Home = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-            {featuredCourses.map((course) => (
-              <CourseCard key={course.id} {...course} />
-            ))}
+            {featuredCourses.map((course) => {
+              const mappedCourse = mapCourseForDisplay(course);
+              return <CourseCard key={course.id} {...mappedCourse} />;
+            })}
           </div>
 
           <div className="text-center">

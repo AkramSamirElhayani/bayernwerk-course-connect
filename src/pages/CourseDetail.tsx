@@ -3,14 +3,28 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { ArrowLeft, Clock, Users, CheckCircle, Target, BookOpen, Award } from "lucide-react";
-import { courses } from "@/data/courses";
+import { ArrowLeft, Clock, Users, CheckCircle, Target, BookOpen, Award, MapPin, User } from "lucide-react";
+import { useCourse } from "@/hooks/useCourses";
+import { mapCourseForDisplay } from "@/utils/courseMapper";
 
 const CourseDetail = () => {
   const { id } = useParams<{ id: string }>();
-  const course = courses.find(c => c.id === id);
+  const { data: courseData, isLoading, error } = useCourse(id || "");
+  
+  const course = courseData ? mapCourseForDisplay(courseData) : null;
 
-  if (!course) {
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading course details...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !course) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -72,11 +86,25 @@ const CourseDetail = () => {
                 <span className="font-medium">Level:</span>
                 <span>{course.level}</span>
               </div>
+              {courseData?.lecturer && (
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <User className="h-5 w-5" />
+                  <span className="font-medium">Lecturer:</span>
+                  <span>{courseData.lecturer}</span>
+                </div>
+              )}
+              {courseData?.location && (
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <MapPin className="h-5 w-5" />
+                  <span className="font-medium">Location:</span>
+                  <span>{courseData.location}</span>
+                </div>
+              )}
               {course.price && (
                 <div className="flex items-center gap-2 text-primary font-semibold">
                   <Award className="h-5 w-5" />
                   <span className="font-medium">Price:</span>
-                  <span className="text-lg">{course.price}</span>
+                  <span className="text-lg">€{course.price}</span>
                 </div>
               )}
             </div>
@@ -174,7 +202,7 @@ const CourseDetail = () => {
               <CardContent className="space-y-4">
                 {course.price && (
                   <div className="text-center py-4 bg-gradient-to-r from-primary to-energy rounded-lg">
-                    <span className="text-2xl font-bold text-primary-foreground">{course.price}</span>
+                    <span className="text-2xl font-bold text-primary-foreground">€{course.price}</span>
                     <p className="text-sm text-primary-foreground/80">per participant</p>
                   </div>
                 )}
