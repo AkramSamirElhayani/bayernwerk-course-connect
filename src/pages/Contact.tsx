@@ -172,7 +172,7 @@ const Contact = () => {
                         <SelectValue placeholder="Select a course..." />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">General Inquiry</SelectItem>
+                        <SelectItem value="general">General Inquiry</SelectItem>
                         {courses.map(course => (
                           <SelectItem key={course.id} value={course.id}>
                             {course.title}
